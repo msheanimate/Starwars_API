@@ -1,23 +1,22 @@
 import { Product } from './product';
 import { ProductService } from '../services/dataAccessService'
 
-export module app.ProductListCtrl {
+export module app.MovieListCtrl {
     
-    export interface IProducListModel {
+    export interface IMovieListModel {
         title: string;
-        showImage: boolean;
-        products: Product.IProduct[];
-        toggleImage(): void;
+        person: any[];
+        // showImage: boolean;
+        // toggleImage(): void;
         service : any;
-
-        getCharactersInfo(characters: any[]): any[];
+        getCharactersInfo(characterUrl: string): any[];
     }
     
 
-    export default class ProductListCtrl implements IProducListModel {
+    export default class MovieListCtrl implements IMovieListModel {
         title: string;
         products: Product.IProduct[];
-        person ;
+        person: any[] ;
         service: any;
         characters: string[];
         selected: string[]
@@ -32,16 +31,16 @@ export module app.ProductListCtrl {
             let selected: string[];
 
             //this.products = service.listProducts(1)
-            service.listProducts(1).then(person => {
+            service.listProducts(1).then((person: any) => {
                 this.person = person;
                 let mainCharacters = person.films[0].characters;
-                person.films.map(film => {
+                person.films.map((film: any) => {
                     let characters = film.characters;
                     film.charactersInfo = [];
                     for (let i = 0; i < 3; i++) {
                         let randomCharacter = characters[Math.floor(Math.random() * characters.length)]
                         let res = this.getCharactersInfo(randomCharacter);
-                        res.then(data => {
+                        res.then((data: any) => {
                             film.charactersInfo.push(data.name);
                         })
                     }
@@ -84,19 +83,19 @@ export module app.ProductListCtrl {
         getCharactersInfo(characterUrl: string){
             let newCharactersInfo: Array<string> = [];
             return this.service.callApi(characterUrl)
-                .then(data => data);
+                .then((data: any) => data);
         }
 
-        toggleImage(): void{
-            this.showImage = !this.showImage;
-        }
+        // toggleImage(): void{
+        //     this.showImage = !this.showImage;
+        // }
 
     }
     //HomeController.$inject = ['$timeout', 'bookShelfSvc'];
-    ProductListCtrl.$inject = ['ProductService'];
+    MovieListCtrl.$inject = ['ProductService'];
 
     angular
         .module('starwarsApp')
-        .controller('ProductListCtrl', ProductListCtrl)
+        .controller('MovieListCtrl', MovieListCtrl)
 
 }

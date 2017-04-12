@@ -5,6 +5,12 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": true,
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "lib": [
+            "dom",
+            "es2015",
+            "es5",
+            "es6"
+        ]
     }
 }

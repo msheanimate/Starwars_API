@@ -4,7 +4,7 @@ module.exports = {
         app: [
                 "./client/app.ts", 
                 "./client/controllers/product.ts",
-                "./client/controllers/productListCtrl.ts",
+                "./client/controllers/movieListCtrl.ts",
                 "./client/services/common.services.ts",
                 "./client/services/dataAccessService.ts",
                 "./client/services/productResourceMock.ts"

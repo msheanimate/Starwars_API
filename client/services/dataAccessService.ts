@@ -8,13 +8,13 @@ export class ProductService {
     listProducts(person:number) {
         
          return this.callApi('http://swapi.co/api/people/'+ person + '/')
-          .then(person => {
-            return Promise.all(person.films.map(filmUrl => this.callApi(filmUrl)))
-              .then(films => ({...person, films: films}))
+          .then((person: any) => {
+            return Promise.all(person.films.map((filmUrl: string) => this.callApi(filmUrl)))
+              .then((films: any) => ({...person, films: films}))
           })
     }
 
-    callApi(url:String){
+    callApi(url:string){
       return this.$http.get(url)
           .then(response => response.data)
           .then(data => data);

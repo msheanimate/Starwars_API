@@ -73,7 +73,7 @@
 var angular = __webpack_require__(7);
 var app;
 (function (app) {
-    angular.module('starwarsApp', []);
+    angular.module('starwarsApp', ['ui.router']);
 })(app || (app = {}));
 
 
@@ -84,40 +84,12 @@ var app;
 "use strict";
 
 exports.__esModule = true;
-var Product;
-(function (Product_1) {
-    var Product = (function () {
-        function Product(productId, productName, productCode, releaseDate, price, description, imageUrl) {
-            this.productId = productId;
-            this.productName = productName;
-            this.productCode = productCode;
-            this.releaseDate = releaseDate;
-            this.price = price;
-            this.description = description;
-            this.imageUrl = imageUrl;
-        }
-        Product.prototype.calculatorDiscount = function (percent) {
-            return this.price - (this.price * percent / 100);
-        };
-        return Product;
-    }());
-    Product_1.Product = Product;
-})(Product = exports.Product || (exports.Product = {}));
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
 var app;
 (function (app) {
-    var ProductListCtrl;
-    (function (ProductListCtrl_1) {
-        var ProductListCtrl = (function () {
-            function ProductListCtrl(service) {
+    var MovieListCtrl;
+    (function (MovieListCtrl_1) {
+        var MovieListCtrl = (function () {
+            function MovieListCtrl(service) {
                 var _this = this;
                 this.title = "Boom";
                 this.service = service;
@@ -141,23 +113,38 @@ var app;
                     });
                 });
             }
-            ProductListCtrl.prototype.getCharactersInfo = function (characterUrl) {
+            MovieListCtrl.prototype.getCharactersInfo = function (characterUrl) {
                 var newCharactersInfo = [];
                 return this.service.callApi(characterUrl)
                     .then(function (data) { return data; });
             };
-            ProductListCtrl.prototype.toggleImage = function () {
-                this.showImage = !this.showImage;
-            };
-            return ProductListCtrl;
+            return MovieListCtrl;
         }());
-        ProductListCtrl_1.ProductListCtrl = ProductListCtrl;
-        ProductListCtrl.$inject = ['ProductService'];
+        MovieListCtrl_1.MovieListCtrl = MovieListCtrl;
+        MovieListCtrl.$inject = ['ProductService'];
         angular
             .module('starwarsApp')
-            .controller('ProductListCtrl', ProductListCtrl);
-    })(ProductListCtrl = app.ProductListCtrl || (app.ProductListCtrl = {}));
+            .controller('MovieListCtrl', MovieListCtrl);
+    })(MovieListCtrl = app.MovieListCtrl || (app.MovieListCtrl = {}));
 })(app = exports.app || (exports.app = {}));
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+exports.__esModule = true;
+var Product;
+(function (Product_1) {
+    var Product = (function () {
+        function Product() {
+        }
+        return Product;
+    }());
+    Product_1.Product = Product;
+})(Product = exports.Product || (exports.Product = {}));
 
 
 /***/ }),
@@ -33610,8 +33597,8 @@ module.exports = angular;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(0);
-__webpack_require__(1);
 __webpack_require__(2);
+__webpack_require__(1);
 __webpack_require__(3);
 __webpack_require__(4);
 module.exports = __webpack_require__(5);
