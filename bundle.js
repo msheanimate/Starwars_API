@@ -73,7 +73,24 @@
 var angular = __webpack_require__(7);
 var app;
 (function (app) {
-    angular.module('starwarsApp', ['ui.router']);
+    angular
+        .module('starwarsApp', ['ui.router'])
+        .config(function ($stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.otherwise('/');
+        $stateProvider
+            .state('home', {
+            url: '/',
+            views: {
+                '': { templateUrl: 'client/templates/films-data.html' },
+                'sideNav@home': {
+                    templateUrl: 'client/templates/side-nav.html'
+                },
+                'sideNavContent@home': {
+                    templateUrl: 'client/templates/side-nav-content.html'
+                }
+            }
+        });
+    });
 })(app || (app = {}));
 
 
@@ -96,27 +113,64 @@ var app;
                 var that = this;
                 this.person;
                 this.characters = [];
+                this.renderedCharacters = [];
                 var selected;
                 service.listProducts(1).then(function (person) {
-                    _this.person = person;
-                    var mainCharacters = person.films[0].characters;
-                    person.films.map(function (film) {
-                        var characters = film.characters;
-                        film.charactersInfo = [];
-                        for (var i = 0; i < 3; i++) {
-                            var randomCharacter = characters[Math.floor(Math.random() * characters.length)];
-                            var res = _this.getCharactersInfo(randomCharacter);
-                            res.then(function (data) {
-                                film.charactersInfo.push(data.name);
-                            });
-                        }
-                    });
+                    _this.person = person.films;
+                    _this.getFilmCharacters(_this.person);
+                    _this.chunkFilms(_this.person);
+                    _this.favoriteCharacters = _this.renderedCharacters;
                 });
             }
+            MovieListCtrl.prototype.chunkFilms = function (films) {
+                var i, j, temparray, chunk = 2;
+                for (var i_1 = 0, j_1 = films.length; i_1 < j_1; i_1 += chunk) {
+                    temparray = films.slice(i_1, i_1 + chunk);
+                    this.renderedCharacters.push(temparray);
+                }
+            };
+            MovieListCtrl.prototype.renderFavoriteCharacter = function () {
+                this.renderedCharacters = [];
+                this.renderedCharacters = this.favoriteCharacters;
+            };
+            MovieListCtrl.prototype.renderLeastFavoriteCharacter = function () {
+                var _this = this;
+                this.renderedCharacters = [];
+                if (this.leastFavoriteCharacters) {
+                    console.log('Already cached. least fcs no need to make new api request');
+                    this.renderedCharacters = this.leastFavoriteCharacters;
+                }
+                else {
+                    this.service.listProducts(2).then(function (person) {
+                        _this.person = person.films;
+                        _this.getFilmCharacters(_this.person);
+                        _this.chunkFilms(_this.person);
+                        _this.leastFavoriteCharacters = _this.renderedCharacters;
+                        console.log(_this.leastFavoriteCharacters, 'least fav.......');
+                    });
+                }
+            };
+            MovieListCtrl.prototype.getFilmCharacters = function (films) {
+                var _this = this;
+                films.map(function (film) {
+                    var characters = film.characters;
+                    film.charactersInfo = [];
+                    for (var i = 0; i < 3; i++) {
+                        var randomCharacter = characters[Math.floor(Math.random() * characters.length)];
+                        var res = _this.getCharactersInfo(randomCharacter);
+                        res.then(function (data) {
+                            film.charactersInfo.push(data.name);
+                        });
+                    }
+                });
+            };
             MovieListCtrl.prototype.getCharactersInfo = function (characterUrl) {
                 var newCharactersInfo = [];
                 return this.service.callApi(characterUrl)
                     .then(function (data) { return data; });
+            };
+            MovieListCtrl.prototype.logItem = function (param) {
+                console.log(param, '...');
             };
             return MovieListCtrl;
         }());

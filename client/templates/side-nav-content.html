@@ -1,0 +1,16 @@
+<div class="panel panel-default" ng-repeat="chunk in vm.renderedCharacters" ng-click="vm.logItem('1')">
+    <div class="row">
+        <div class="col-xs-6" ng-repeat="film in chunk">
+            <img src="" alt="xyz">
+            <p>Title: {{ film.title }}</p>
+            <p>Director: {{ film.director }}</p>
+            <p>Date Created: {{ film.created | date }}</p>
+            <p>Favorite Characters:
+                <span ng-repeat="character in film.charactersInfo track by $index">
+                {{character}},
+            </span>
+            </p>
+        </div>
+    </div>
+
+</div>
