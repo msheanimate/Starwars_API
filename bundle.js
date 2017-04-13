@@ -63,18 +63,50 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var angular = __webpack_require__(7);
+"use strict";
+
+exports.__esModule = true;
+exports.graphOptions = {
+    chart: {
+        type: 'discreteBarChart',
+        height: 450,
+        margin: {
+            top: 20,
+            right: 20,
+            bottom: 50,
+            left: 55
+        },
+        x: function (d) { return d.label; },
+        y: function (d) { return d.value; },
+        showValues: true,
+        duration: 500,
+        xAxis: {
+            axisLabel: 'Title'
+        },
+        yAxis: {
+            axisLabel: 'Crawl Count',
+            axisLabelDistance: -10
+        }
+    }
+};
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var angular = __webpack_require__(6);
 var app;
 (function (app) {
     angular
-        .module('starwarsApp', ['ui.router'])
+        .module('starwarsApp', ['ui.router', 'nvd3'])
         .config(function ($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise('/');
         $stateProvider
@@ -87,6 +119,9 @@ var app;
                 },
                 'sideNavContent@home': {
                     templateUrl: 'client/templates/side-nav-content.html'
+                },
+                'contentGraph@home': {
+                    templateUrl: 'client/templates/content-graph.html'
                 }
             }
         });
@@ -95,12 +130,13 @@ var app;
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
+var graphOptions_1 = __webpack_require__(0);
 var app;
 (function (app) {
     var MovieListCtrl;
@@ -115,11 +151,17 @@ var app;
                 this.characters = [];
                 this.renderedCharacters = [];
                 var selected;
-                service.listProducts(1).then(function (person) {
+                this.options = graphOptions_1.graphOptions;
+                this.data = [{
+                        key: "Cumulative Return",
+                        values: []
+                    }];
+                service.listData(1).then(function (person) {
                     _this.person = person.films;
                     _this.getFilmCharacters(_this.person);
                     _this.chunkFilms(_this.person);
                     _this.favoriteCharacters = _this.renderedCharacters;
+                    _this.updateGraph();
                 });
             }
             MovieListCtrl.prototype.chunkFilms = function (films) {
@@ -130,25 +172,43 @@ var app;
                 }
             };
             MovieListCtrl.prototype.renderFavoriteCharacter = function () {
+                console.log("this.renderedCharacters");
                 this.renderedCharacters = [];
                 this.renderedCharacters = this.favoriteCharacters;
+                this.updateGraph();
             };
             MovieListCtrl.prototype.renderLeastFavoriteCharacter = function () {
                 var _this = this;
                 this.renderedCharacters = [];
                 if (this.leastFavoriteCharacters) {
-                    console.log('Already cached. least fcs no need to make new api request');
                     this.renderedCharacters = this.leastFavoriteCharacters;
+                    this.updateGraph();
                 }
                 else {
-                    this.service.listProducts(2).then(function (person) {
+                    this.renderedCharacters = [];
+                    this.service.listData(2).then(function (person) {
                         _this.person = person.films;
                         _this.getFilmCharacters(_this.person);
                         _this.chunkFilms(_this.person);
                         _this.leastFavoriteCharacters = _this.renderedCharacters;
-                        console.log(_this.leastFavoriteCharacters, 'least fav.......');
+                        _this.updateGraph();
                     });
                 }
+            };
+            MovieListCtrl.prototype.updateGraph = function () {
+                var _this = this;
+                var flattened = [];
+                this.renderedCharacters.map(function (chunk) {
+                    chunk.map(function (item) {
+                        flattened.push(item);
+                    });
+                });
+                flattened.map(function (item) {
+                    _this.data[0].values.push({
+                        "label": item.title,
+                        "value": item.opening_crawl.length
+                    });
+                });
             };
             MovieListCtrl.prototype.getFilmCharacters = function (films) {
                 var _this = this;
@@ -170,35 +230,16 @@ var app;
                     .then(function (data) { return data; });
             };
             MovieListCtrl.prototype.logItem = function (param) {
-                console.log(param, '...');
             };
             return MovieListCtrl;
         }());
         MovieListCtrl_1.MovieListCtrl = MovieListCtrl;
-        MovieListCtrl.$inject = ['ProductService'];
+        MovieListCtrl.$inject = ['DataService'];
         angular
             .module('starwarsApp')
             .controller('MovieListCtrl', MovieListCtrl);
     })(MovieListCtrl = app.MovieListCtrl || (app.MovieListCtrl = {}));
 })(app = exports.app || (exports.app = {}));
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-exports.__esModule = true;
-var Product;
-(function (Product_1) {
-    var Product = (function () {
-        function Product() {
-        }
-        return Product;
-    }());
-    Product_1.Product = Product;
-})(Product = exports.Product || (exports.Product = {}));
 
 
 /***/ }),
@@ -229,12 +270,11 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     return t;
 };
 exports.__esModule = true;
-var ProductService = (function () {
-    function ProductService($http) {
+var DataService = (function () {
+    function DataService($http) {
         this.$http = $http;
-        console.log("CommentsService register");
     }
-    ProductService.prototype.listProducts = function (person) {
+    DataService.prototype.listData = function (person) {
         var _this = this;
         return this.callApi('http://swapi.co/api/people/' + person + '/')
             .then(function (person) {
@@ -242,27 +282,21 @@ var ProductService = (function () {
                 .then(function (films) { return (__assign({}, person, { films: films })); });
         });
     };
-    ProductService.prototype.callApi = function (url) {
+    DataService.prototype.callApi = function (url) {
         return this.$http.get(url)
             .then(function (response) { return response.data; })
             .then(function (data) { return data; });
     };
-    return ProductService;
+    return DataService;
 }());
-exports.ProductService = ProductService;
+exports.DataService = DataService;
 angular
     .module('starwarsApp')
-    .service('ProductService', ProductService);
+    .service('DataService', DataService);
 
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports) {
-
-
-
-/***/ }),
-/* 6 */
 /***/ (function(module, exports) {
 
 /**
@@ -33639,23 +33673,22 @@ $provide.value("$locale", {
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(6);
+__webpack_require__(5);
 module.exports = angular;
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(1);
 __webpack_require__(0);
 __webpack_require__(2);
-__webpack_require__(1);
 __webpack_require__(3);
-__webpack_require__(4);
-module.exports = __webpack_require__(5);
+module.exports = __webpack_require__(4);
 
 
 /***/ })

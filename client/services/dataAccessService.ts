@@ -1,12 +1,10 @@
-export class ProductService {
+export class DataService {
 
-  constructor(private $http: ng.IHttpService) {
-    console.log(`CommentsService register`);
-  }
+    constructor(private $http: ng.IHttpService) {
+      //console.log(`CommentsService register`);
+    }
 
-
-    listProducts(person:number) {
-        
+    listData(person:number) {
          return this.callApi('http://swapi.co/api/people/'+ person + '/')
           .then((person: any) => {
             return Promise.all(person.films.map((filmUrl: string) => this.callApi(filmUrl)))
@@ -25,4 +23,4 @@ export class ProductService {
 }
     angular
         .module('starwarsApp')
-        .service('ProductService', ProductService)
+        .service('DataService', DataService)

@@ -1,5 +1,6 @@
-import { Product } from './product';
-import { ProductService } from '../services/dataAccessService'
+
+import { DataService } from '../services/dataAccessService'
+import { graphOptions } from './graphOptions'
 
 export module app.MovieListCtrl {
 
@@ -15,8 +16,9 @@ export module app.MovieListCtrl {
 
     export default class MovieListCtrl implements IMovieListModel {
         title: string;
-        products: Product.IProduct[];
         person: any[];
+        data: any;
+        options: any;
         renderedCharacters: any[];
         favoriteCharacters: any[];
         leastFavoriteCharacters: any[];
@@ -24,7 +26,7 @@ export module app.MovieListCtrl {
         characters: string[];
         selected: string[]
 
-        constructor(service: ProductService) {
+        constructor(service: DataService) {
 
             this.title = "Boom"
             this.service = service;
@@ -33,47 +35,22 @@ export module app.MovieListCtrl {
             this.characters = [];
             this.renderedCharacters = [];
             let selected: string[];
+            this.options = graphOptions;
 
-            //this.products = service.listProducts(1)
-            service.listProducts(1).then((person: any) => {
+
+            this.data = [{
+                key: "Cumulative Return",
+                values: []
+            }];
+
+            service.listData(1).then((person: any) => {
                 this.person = person.films;
                 this.getFilmCharacters(this.person);
                 this.chunkFilms(this.person);
                 this.favoriteCharacters = this.renderedCharacters;
+                this.updateGraph();
             });
-            // [
-            //     {
-            //         "productId": 1,
-            //         "productName": "Leaf Rake",
-            //         "productCode": "GDN-0011",
-            //         "releaseDate": new Date(2009, 2, 19),
-            //         "description": "Leaf rake with 48-inch wooden handle.",
-            //         "price": 19.95,
-            //         "imageUrl": "http://openclipart.org/image/300px/svg_to_png/26215/Anonymous_Leaf_Rake.png"
-            //     },
-            //     {
-            //         "productId": 1,
-            //         "productName": "Leaf Rake",
-            //         "productCode": "GDN-0011",
-            //         "releaseDate": new Date(2009, 2, 19),
-            //         "description": "Leaf rake with 48-inch wooden handle.",
-            //         "price": 19.95,
-            //         "imageUrl": "http://openclipart.org/image/300px/svg_to_png/26215/Anonymous_Leaf_Rake.png"
-            //     },
-            //     {
-            //         "productId": 1,
-            //         "productName": "Leaf Rake",
-            //         "productCode": "GDN-0011",
-            //         "releaseDate": new Date(2009, 2, 19),
-            //         "description": "Leaf rake with 48-inch wooden handle.",
-            //         "price": 19.95,
-            //         "imageUrl": "http://openclipart.org/image/300px/svg_to_png/26215/Anonymous_Leaf_Rake.png"
-            //     }
 
-            // ];
-
-            //var prod = new Product.Product(1,"adsf","asdf", new Date(2002, 2,2), 123, "adsf","http://openclipart.org/image/300px/svg_to_png/26215/Anonymous_Leaf_Rake.png" )
-            //this.products.push(prod);
         }
         chunkFilms(films: any) {
             var i, j, temparray, chunk = 2;
@@ -83,23 +60,42 @@ export module app.MovieListCtrl {
             }
         }
         renderFavoriteCharacter() {
+            console.log("this.renderedCharacters")
             this.renderedCharacters = [];
             this.renderedCharacters = this.favoriteCharacters;
+            this.updateGraph();
         }
         renderLeastFavoriteCharacter() {
+            
             this.renderedCharacters = [];
             if (this.leastFavoriteCharacters) {
-                console.log('Already cached. least fcs no need to make new api request');
                 this.renderedCharacters = this.leastFavoriteCharacters;
+                this.updateGraph();
             } else {
-                this.service.listProducts(2).then((person: any) => {
+                this.renderedCharacters = [];
+                this.service.listData(2).then((person: any) => {
                     this.person = person.films;
                     this.getFilmCharacters(this.person);
                     this.chunkFilms(this.person);
                     this.leastFavoriteCharacters = this.renderedCharacters;
-                    console.log(this.leastFavoriteCharacters, 'least fav.......');
+                    this.updateGraph();
                 });
             }
+        }
+        updateGraph() {
+            let flattened: Array<any> = [];
+            this.renderedCharacters.map((chunk: any) => {
+                chunk.map((item: any) => {
+                    flattened.push(item);
+                })
+            });
+
+            flattened.map((item: any) => {
+                this.data[0].values.push({
+                    "label": item.title,
+                    "value": item.opening_crawl.length
+                });
+            });
         }
         getFilmCharacters(films: any) {
             films.map((film: any) => {
@@ -120,7 +116,7 @@ export module app.MovieListCtrl {
                 .then((data: any) => data);
         }
         logItem(param: any) {
-            console.log(param, '...')
+            //console.log(param, '...')
         }
 
         // toggleImage(): void{
@@ -129,7 +125,7 @@ export module app.MovieListCtrl {
 
     }
     //HomeController.$inject = ['$timeout', 'bookShelfSvc'];
-    MovieListCtrl.$inject = ['ProductService'];
+    MovieListCtrl.$inject = ['DataService'];
 
     angular
         .module('starwarsApp')

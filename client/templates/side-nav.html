@@ -1,14 +1,28 @@
+<style>
+ .panel{background-color: white}
+ .panel-default{background-color: #375a7f}
+ .navbar{background-color:#375a7f;}
+ .navbar-default .navbar-brand{color: white}
+ 
+</style>
 <div>
-    <div class="panel panel-default" ng-click="vm.renderFavoriteCharacter()">
+    <div class="panel panel-default btn btn-primary" ng-click="vm.renderLeastFavoriteCharacter()">
         <div class="panel-body">
-            <h4>Your Favorite Character</h4>
-            <p>Your favorite starwars character</p>
+            <h4>Favorite Character</h4>
+            <p>Your least favorite starwars character</p>
+ 
         </div>
     </div>
-    <div class="panel panel-default" ng-click="vm.renderLeastFavoriteCharacter()">
+    <div class="panel panel-default btn btn-primary" ng-click="vm.renderLeastFavoriteCharacter()">
         <div class="panel-body">
-            <h4>Your Least Favorite Character</h4>
-            <p>Your least favorite starwars character</p>
+            <h4>Least Favorite Starwars Character</h4>
+            <p>Your least favorite Starwars character</p>
+        </div>
+    </div>
+        <div class="panel" ng-click="vm.renderFavoriteCharacter()">
+        <div class="panel-body">
+            <h4>How long are those opening crawls?</h4>
+            <p>Show a simple chart that plots each Starwars Movie and the length of their opening crawls.  The Y-axis has the crawl length, and the X-Axis has the name of the Starwars movie.</p>
         </div>
     </div>
 </div>
